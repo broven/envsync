@@ -27,6 +27,10 @@ export interface InitOptions {
 export async function initCommand(options: InitOptions): Promise<void> {
   const repoRoot = findRepoRoot(process.cwd());
 
+  // Prompts only make sense in an interactive terminal. In scripts, CI or
+  // when piped (e.g. some `npx` setups), fall back to defaults — same as --yes.
+  const interactive = !options.yes && process.stdin.isTTY === true;
+
   p.intro(pc.bgCyan(pc.black(' envsync init ')));
 
   // ── Scan ────────────────────────────────────────────────────────────────
@@ -110,7 +114,7 @@ export async function initCommand(options: InitOptions): Promise<void> {
     p.log.info(`Merged scan results into existing ${CONFIG_FILENAME} (project: ${config.project})`);
   } else {
     let project = defaultProjectName(repoRoot);
-    if (!options.yes) {
+    if (interactive) {
       const answer = await p.text({
         message: 'Bitwarden item name for this project',
         defaultValue: project,
@@ -147,8 +151,9 @@ export async function initCommand(options: InitOptions): Promise<void> {
     p.log.warn(
       `These env files are NOT covered by .gitignore:\n  ${unignored.join('\n  ')}`,
     );
-    let addToGitignore = options.yes ?? false;
-    if (!options.yes) {
+    // Non-interactive: always add to .gitignore (the safe default)
+    let addToGitignore = true;
+    if (interactive) {
       const answer = await p.confirm({
         message: 'Add them to .gitignore?',
         initialValue: true,

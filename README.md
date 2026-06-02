@@ -2,10 +2,15 @@
 
 > Sync `.env` files to Bitwarden — commit the mapping, not the secrets.
 
+English | [简体中文](./README.zh-CN.md)
+
+[![npm](https://img.shields.io/npm/v/@metajs/envsync)](https://www.npmjs.com/package/@metajs/envsync)
+[![CI](https://github.com/broven/envsync/actions/workflows/ci.yml/badge.svg)](https://github.com/broven/envsync/actions/workflows/ci.yml)
+
 `envsync` scans your git repository for env files (`.env`, `.env.*`, Cloudflare's `.dev.vars`, …),
 stores their values in your Bitwarden vault, and generates a **value-free** `.envsync` mapping file
-that is safe to commit. Anyone who clones the repo just runs `envsync pull` to materialize all env
-files from Bitwarden.
+that is safe to commit. Anyone who clones the repo just runs `envsync pull` to materialize every env
+file with real values — no more "can you send me the .env?" in Slack.
 
 ```
 ┌─────────────┐   envsync push    ┌──────────────┐   envsync pull    ┌─────────────┐
@@ -27,43 +32,61 @@ npm install -g @bitwarden/cli   # or: brew install bitwarden-cli
 bw login
 ```
 
-## Install
+Works with both bitwarden.com accounts and self-hosted servers (Vaultwarden included).
+
+## Usage
+
+### Run directly with npx (no install)
+
+```bash
+npx @metajs/envsync init
+npx @metajs/envsync push
+npx @metajs/envsync pull
+```
+
+### Or install globally
 
 ```bash
 npm install -g @metajs/envsync
+
+envsync init
 ```
+
+The command is `envsync` either way.
 
 ## Quick start
 
-### Project owner
+### Project owner — first time setup
 
 ```bash
 cd your-project
-export BW_SESSION=$(bw unlock --raw)
+export BW_SESSION=$(bw unlock --raw)    # unlock your vault
 
-envsync init     # scan env files, generate .envsync (+ missing .example files)
-envsync push     # upload values to Bitwarden
+npx @metajs/envsync init    # scan env files → .envsync (+ missing .example files)
+npx @metajs/envsync push    # upload values to Bitwarden
 
 git add .envsync *.example
 git commit -m "chore: add envsync"
 ```
 
-### Teammates
+### Teammates — after cloning
 
 ```bash
-git clone your-project && cd your-project
+git clone <your-project> && cd <your-project>
 export BW_SESSION=$(bw unlock --raw)
 
-envsync pull     # all .env files materialize with values from Bitwarden
+npx @metajs/envsync pull    # every .env file appears, filled with real values
 ```
+
+That's it. Two commands and they're running the project.
 
 ## Commands
 
 | Command | Description |
 |---|---|
-| `envsync init` | Scan the repo for env files and generate the `.envsync` mapping. Auto-creates missing `.example` files and offers to update `.gitignore`. |
-| `envsync push` | Upload local env values to Bitwarden. Keys without local values are skipped (never overwrites remote values with blanks). `--dry-run` to preview. |
-| `envsync pull` | Generate local env files from Bitwarden. Existing files only get missing keys filled; use `--force` to overwrite completely. Files are created with `600` permissions. |
+| `envsync init` | Scan the repo for env files and generate the `.envsync` mapping. Auto-creates missing `.example` files and updates `.gitignore`. `--yes` skips prompts. |
+| `envsync push` | Upload local env values to Bitwarden. Keys without local values are skipped — never overwrites remote values with blanks. `--dry-run` to preview. |
+| `envsync pull` | Generate local env files from Bitwarden. Existing files only get missing keys filled; `--force` overwrites completely. Files are written with `600` permissions. |
 | `envsync status` | Compare local values with Bitwarden: ✓ synced / ↑ local only / ↓ remote only / ≠ different. Never prints secret values. |
 
 ## What gets scanned
@@ -73,7 +96,7 @@ envsync pull     # all .env files materialize with values from Bitwarden
 - Recursively, including monorepo sub-packages
 - Dependency/build directories are skipped: `node_modules`, `.venv`, `venv`, `__pycache__`, `vendor`, `dist`, `build`, `target`, …
 
-**Example file logic:**
+**Example file pairing:**
 
 1. `.env.xxx.example` exists, `.env.xxx` doesn't → keys are collected from the example, no values
 2. Both exist → keys from the example, values from the actual file
@@ -126,18 +149,28 @@ Committed to git. Contains the mapping only — **never any values**:
 
 ### Shared secrets across projects
 
-Point any key at an existing item in another folder by replacing `true` with
+Point any key at an existing item in another Bitwarden folder by replacing `true` with
 `{ "folder": "...", "item": "...", "field": "..." }`. `envsync pull` reads it from there;
 `envsync push` never writes to it. Perfect for company-wide keys (Stripe, Sentry, …) that
-many projects share.
+many projects share — update once, every project pulls the new value.
 
-## Security notes
+## Security
 
 - `.envsync` contains key names and Bitwarden item names only — no secret values
 - Secret values never appear in envsync's output (logs, status, errors)
 - Pulled files are written with `600` (owner read/write only) permissions
 - All values are stored as **hidden** custom fields in Bitwarden
 - Auth is fully delegated to the official `bw` CLI — envsync never sees your master password
+- Published with [npm provenance](https://docs.npmjs.com/generating-provenance-statements) — verifiable build from GitHub Actions
+
+## Troubleshooting
+
+| Error | Fix |
+|---|---|
+| `Bitwarden CLI (bw) is not installed` | `npm install -g @bitwarden/cli` |
+| `You are not logged in to Bitwarden` | `bw login` |
+| `Your Bitwarden vault is locked` | `export BW_SESSION=$(bw unlock --raw)` |
+| `No item "xxx" found in the Bitwarden "envsync" folder` | The project owner hasn't run `envsync push` yet, or your account can't see the item |
 
 ## License
 

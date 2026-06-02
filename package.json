@@ -10,7 +10,8 @@
   "files": [
     "dist",
     "schema.json",
-    "README.md"
+    "README.md",
+    "README.zh-CN.md"
   ],
   "scripts": {
     "build": "tsup",
