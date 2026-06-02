@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://unpkg.com/envsync/schema.json",
+  "title": "envsync configuration",
+  "description": "Maps env file keys to Bitwarden items. Contains no secret values.",
+  "type": "object",
+  "required": ["version", "project", "files"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": { "const": 1 },
+    "project": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Bitwarden item name inside the envsync folder"
+    },
+    "files": {
+      "type": "object",
+      "description": "Repo-relative env file paths",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["example", "keys"],
+        "properties": {
+          "example": {
+            "type": "string",
+            "description": "Repo-relative path of the example file"
+          },
+          "keys": {
+            "type": "object",
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "const": true,
+                  "description": "Stored in this project's own Bitwarden item"
+                },
+                {
+                  "type": "object",
+                  "description": "External reference: read from another Bitwarden folder/item",
+                  "required": ["folder", "item", "field"],
+                  "properties": {
+                    "folder": { "type": "string" },
+                    "item": { "type": "string" },
+                    "field": { "type": "string" }
+                  },
+                  "additionalProperties": false
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

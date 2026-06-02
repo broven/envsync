@@ -1,0 +1,50 @@
+{
+  "name": "envsync",
+  "version": "0.1.0",
+  "description": "Sync .env files to Bitwarden. Scan your repo, commit a value-free .envsync mapping, and let teammates pull secrets with one command.",
+  "type": "module",
+  "bin": {
+    "envsync": "dist/cli.js"
+  },
+  "main": "dist/cli.js",
+  "files": [
+    "dist",
+    "schema.json",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run typecheck && npm run test && npm run build"
+  },
+  "keywords": [
+    "env",
+    "dotenv",
+    "bitwarden",
+    "secrets",
+    "sync",
+    "environment-variables",
+    "cli",
+    "dev-vars",
+    "cloudflare"
+  ],
+  "author": "Randy",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.11.0",
+    "commander": "^14.0.0",
+    "picocolors": "^1.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.6.0",
+    "vitest": "^4.1.8"
+  }
+}
