@@ -1,6 +1,6 @@
 {
   "name": "@metajs/envsync",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Sync .env files to Bitwarden. Scan your repo, commit a value-free .envsync mapping, and let teammates pull secrets with one command.",
   "type": "module",
   "bin": {
