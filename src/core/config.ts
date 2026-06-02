@@ -2,7 +2,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 export const CONFIG_FILENAME = '.envsync';
-export const SCHEMA_URL = 'https://unpkg.com/envsync/schema.json';
+export const SCHEMA_URL = 'https://unpkg.com/@metajs/envsync/schema.json';
 
 /** A key whose value lives in another Bitwarden folder/item (shared secret) */
 export interface ExternalRef {

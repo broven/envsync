@@ -63,7 +63,7 @@ export const FIELD_TYPE_HIDDEN = 1;
 const ITEM_TYPE_SECURE_NOTE = 2;
 
 const NOTE_BODY =
-  'Managed by envsync (https://www.npmjs.com/package/envsync). ' +
+  'Managed by envsync (https://www.npmjs.com/package/@metajs/envsync). ' +
   'Each field is one environment variable: <file>-<KEY>.';
 
 /** Executes a bw CLI command — injectable for tests */

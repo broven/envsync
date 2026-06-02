@@ -3,13 +3,17 @@ name: Release
 # Publish to npm when a version tag is pushed:
 #   npm version patch   (bumps package.json + creates tag)
 #   git push --follow-tags
+#
+# Auth: npm Trusted Publishing (OIDC) — no token required.
+# Configured at: npmjs.com -> @metajs/envsync -> Settings -> Trusted Publisher
+#   (GitHub repo: broven/envsync, workflow: release.yml)
 on:
   push:
     tags: ['v*']
 
 permissions:
   contents: write # create GitHub release
-  id-token: write # npm provenance
+  id-token: write # npm trusted publishing (OIDC) + provenance
 
 jobs:
   publish:
@@ -17,11 +21,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # node 24 ships npm >= 11.5.1, required for trusted publishing
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: npm
-          registry-url: https://registry.npmjs.org
 
       - run: npm ci
 
@@ -35,9 +39,7 @@ jobs:
 
       # prepublishOnly runs typecheck + test + build automatically
       - name: Publish to npm
-        run: npm publish --access public --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish
 
       - name: Create GitHub release
         run: gh release create '${{ github.ref_name }}' --generate-notes

@@ -30,7 +30,7 @@ bw login
 ## Install
 
 ```bash
-npm install -g envsync
+npm install -g @metajs/envsync
 ```
 
 ## Quick start
@@ -100,7 +100,7 @@ Committed to git. Contains the mapping only — **never any values**:
 
 ```jsonc
 {
-  "$schema": "https://unpkg.com/envsync/schema.json",
+  "$schema": "https://unpkg.com/@metajs/envsync/schema.json",
   "version": 1,
   "project": "myapp",                    // Bitwarden item name
   "files": {
